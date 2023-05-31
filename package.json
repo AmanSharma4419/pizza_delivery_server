@@ -1,0 +1,17 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server for pizza delivery application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Aman Kumar Sharma",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.1.2",
+    "express": "^4.18.2",
+    "mongoose": "^7.2.2"
+  }
+}
