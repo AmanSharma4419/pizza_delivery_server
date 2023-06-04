@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const { errorMessages } = require("../constants/errorMessages");
+const { setLoggedInUser } = require("../services/redisConnection");
 
 const createUser = async (req, res, next) => {
   try {
@@ -25,6 +26,7 @@ const loginUser = async (req, res, next) => {
     if (existingUser) {
       const isPasswordVerified = existingUser.confirmPassword(password);
       if (isPasswordVerified) {
+        setLoggedInUser(existingUser);
         return res.status(200).json({ data: existingUser });
       } else {
         return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });

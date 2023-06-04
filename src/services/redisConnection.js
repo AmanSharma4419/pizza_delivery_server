@@ -1,16 +1,22 @@
-const { createClient } = require("redis");
+const { Redis } = require("ioredis");
+const client = new Redis(process.env.REDIS_URL);
 
-const redisConnectionSetUp = async (url) => {
-  try {
-    const client = createClient({
-      url: url,
-    });
-    await client.connect();
-    await client.set("connection", "successfull");
-    return true;
-  } catch (error) {
-    console.log(`Redis Connection Failed ${error.message}`);
-  }
+client.on("error", (err) => {
+  console.error("Upstash Redis connection error:", err.message);
+});
+
+module.exports = {
+  setLoggedInUser: async (user) => {
+    try {
+      client.set(`${user._id}`, user, (error, reply) => {
+        if (error) {
+          console.log(error, "eeeeeee");
+        } else {
+          console.log("Data set in Redis:", reply);
+        }
+      });
+    } catch (error) {
+      console.log(error, "eeeeeee");
+    }
+  },
 };
-
-module.exports = { redisConnectionSetUp };

@@ -9,7 +9,6 @@ const userRoutes = require("./src/routes/userRoutes.js");
 
 const PORT = process.env.PORT || 7000;
 const { dbConnection } = require("./src/db/db.connection");
-const { redisConnectionSetUp } = require("./src/services/redisConnection");
 
 // Db connection
 dbConnection(process.env.DB_URL).then((res) => {
@@ -19,11 +18,7 @@ dbConnection(process.env.DB_URL).then((res) => {
 });
 
 // Redis connection
-redisConnectionSetUp(process.env.REDIS_URL).then((res) => {
-  if (res) {
-    return console.log(`Redis connection status ${res}`);
-  }
-});
+require("./src/services/redisConnection");
 
 app.use(cors());
 app.use(express.json());
