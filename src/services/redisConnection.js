@@ -8,15 +8,24 @@ client.on("error", (err) => {
 module.exports = {
   setLoggedInUser: async (user) => {
     try {
-      client.set(`${user._id}`, user, (error, reply) => {
+      const userInfo = JSON.stringify(user);
+      await client.set(`${user._id}`, userInfo, (error, reply) => {
         if (error) {
-          console.log(error, "eeeeeee");
+          console.log(error.message);
         } else {
           console.log("Data set in Redis:", reply);
         }
       });
     } catch (error) {
-      console.log(error, "eeeeeee");
+      console.log(error.message);
+    }
+  },
+  getLoggedInUser: async (user) => {
+    try {
+      const value = await client.get(`${user._id}`);
+      console.log("Value retrieved from Redis:", value);
+    } catch (error) {
+      console.log(error.message);
     }
   },
 };

@@ -1,6 +1,10 @@
 const User = require("../models/userModel");
 const { errorMessages } = require("../constants/errorMessages");
-const { setLoggedInUser } = require("../services/redisConnection");
+const {
+  setLoggedInUser,
+  getLoggedInUser,
+} = require("../services/redisConnection");
+const { generateAuthToken } = require("../services/authToken");
 
 const createUser = async (req, res, next) => {
   try {
@@ -25,9 +29,14 @@ const loginUser = async (req, res, next) => {
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
       const isPasswordVerified = existingUser.confirmPassword(password);
+      const userInfo = getLoggedInUser(existingUser);
+      console.log(userInfo, "userInfouserInfo");
       if (isPasswordVerified) {
-        setLoggedInUser(existingUser);
-        return res.status(200).json({ data: existingUser });
+        const loggedInUserInfo = { ...existingUser._doc };
+        const authToken = generateAuthToken(existingUser);
+        loggedInUserInfo.authToken = authToken;
+        setLoggedInUser(loggedInUserInfo);
+        return res.status(200).json({ data: loggedInUserInfo });
       } else {
         return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });
       }
