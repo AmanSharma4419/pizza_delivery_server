@@ -3,20 +3,27 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
+
 const pizzaRoutes = require("./src/routes/pizzaRoutes.js");
 const userRoutes = require("./src/routes/userRoutes.js");
 
 const PORT = process.env.PORT || 7000;
 const { dbConnection } = require("./src/db/db.connection");
+const { redisConnectionSetUp } = require("./src/services/redisConnection");
 
 // Db connection
-dbConnection(process.env.DB_URL)
-  .then((res) => {
+dbConnection(process.env.DB_URL).then((res) => {
+  if (res) {
     return console.log("MongoDb Connected");
-  })
-  .catch((err) => {
-    return console.log(err.message);
-  });
+  }
+});
+
+// Redis connection
+redisConnectionSetUp(process.env.REDIS_URL).then((res) => {
+  if (res) {
+    return console.log(`Redis connection status ${res}`);
+  }
+});
 
 app.use(cors());
 app.use(express.json());
@@ -33,7 +40,6 @@ app.use((err, req, res, next) => {
 // API Paths
 app.use("/api/pizza", pizzaRoutes);
 app.use("/api/user", userRoutes);
-
 
 app.get("/", (req, res) => {
   return res.send("Hello From ExpressJs Server");

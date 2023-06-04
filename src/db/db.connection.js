@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const dbConnection = async (url) => {
-  return await mongoose.connect(url);
+  try {
+    return await mongoose.connect(url);
+  } catch (error) {
+    console.log(`MongoDb Connection Failed ${error.message}`);
+  }
 };
 
 module.exports = { dbConnection };
