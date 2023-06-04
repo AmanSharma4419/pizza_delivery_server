@@ -20,12 +20,17 @@ const createUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
-      const { email, password } = existingUser;
-      const user = User.matchPasswordAndCreateToken(email, password);
-      // return res.status(200).json({ data: user });
+      const isPasswordVerified = existingUser.confirmPassword(password);
+      if (isPasswordVerified) {
+        return res.status(200).json({ data: existingUser });
+      } else {
+        return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });
+      }
+    } else {
+      return res.status(400).json({ data: errorMessages.USER_NOT_FOUND });
     }
   } catch (error) {
     next(error);
