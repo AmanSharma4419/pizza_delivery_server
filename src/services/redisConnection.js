@@ -23,7 +23,7 @@ module.exports = {
   getLoggedInUser: async (user) => {
     try {
       const value = await client.get(`${user._id}`);
-      console.log("Value retrieved from Redis:", value);
+      return value;
     } catch (error) {
       console.log(error.message);
     }

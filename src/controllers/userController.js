@@ -29,14 +29,18 @@ const loginUser = async (req, res, next) => {
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
       const isPasswordVerified = existingUser.confirmPassword(password);
-      const userInfo = getLoggedInUser(existingUser);
-      console.log(userInfo, "userInfouserInfo");
       if (isPasswordVerified) {
-        const loggedInUserInfo = { ...existingUser._doc };
-        const authToken = generateAuthToken(existingUser);
-        loggedInUserInfo.authToken = authToken;
-        setLoggedInUser(loggedInUserInfo);
-        return res.status(200).json({ data: loggedInUserInfo });
+        const loggedInUserInfoInRedis = await getLoggedInUser(existingUser);
+        if (loggedInUserInfoInRedis) {
+          const loggedInUserInfo = JSON.parse(loggedInUserInfoInRedis);
+          return res.status(200).json({ data: loggedInUserInfo });
+        } else {
+          const loggedInUserInfo = { ...existingUser._doc };
+          const authToken = generateAuthToken(existingUser);
+          loggedInUserInfo.authToken = authToken;
+          setLoggedInUser(loggedInUserInfo);
+          return res.status(200).json({ data: loggedInUserInfo });
+        }
       } else {
         return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });
       }
