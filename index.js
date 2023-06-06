@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 // Error handler
 app.use((err, req, res, next) => {
   // Set a default error status code if not provided
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || 400;
   // Set the response status code and send the error message
   res.status(statusCode).json({ error: err.message });
 });

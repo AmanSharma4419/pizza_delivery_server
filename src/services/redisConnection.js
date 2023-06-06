@@ -2,7 +2,7 @@ const { Redis } = require("ioredis");
 const client = new Redis(process.env.REDIS_URL);
 
 client.on("error", (err) => {
-  console.error("Upstash Redis connection error:", err.message);
+  console.error("upstash redis connection error:", err.message);
 });
 
 module.exports = {

@@ -11,7 +11,9 @@ const createUser = async (req, res, next) => {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
-      return res.status(400).json({ data: errorMessages.USER_EXISTS });
+      return res
+        .status(200)
+        .json({ data: { data: errorMessages.USER_EXISTS } });
     }
     const userData = { name: name, email: email, password: password };
     const user = await User.create(userData);
