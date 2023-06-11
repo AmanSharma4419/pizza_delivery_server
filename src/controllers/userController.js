@@ -4,6 +4,7 @@ const {
   setLoggedInUser,
   getLoggedInUser,
 } = require("../services/redisConnection");
+const { sendMailWithPassword } = require("../services/mailService");
 const { generateAuthToken } = require("../services/authToken");
 
 const createUser = async (req, res, next) => {
@@ -28,7 +29,7 @@ const createUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const existingUser = await User.findOne({ email: email });
+    const existingUser = await User.findOne({ email: email }).exec();
     if (existingUser) {
       const isPasswordVerified = existingUser.confirmPassword(password);
       if (isPasswordVerified) {
@@ -37,7 +38,7 @@ const loginUser = async (req, res, next) => {
           const loggedInUserInfo = JSON.parse(loggedInUserInfoInRedis);
           return res.status(200).json({ data: loggedInUserInfo });
         } else {
-          const loggedInUserInfo = { ...existingUser._doc };
+          const loggedInUserInfo = { ...existingUser };
           const authToken = generateAuthToken(existingUser);
           loggedInUserInfo.authToken = authToken;
           setLoggedInUser(loggedInUserInfo);
@@ -54,4 +55,17 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-module.exports = { createUser, loginUser };
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const existingUser = await User.findOne({ email: email }).exec();
+    if (existingUser) {
+      sendMailWithPassword(req, res, next, existingUser);
+    } else {
+      return res.status(400).json({ data: errorMessages.USER_NOT_FOUND });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { createUser, loginUser, forgotPassword };
