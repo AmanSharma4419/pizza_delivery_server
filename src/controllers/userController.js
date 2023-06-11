@@ -4,6 +4,7 @@ const {
   setLoggedInUser,
   getLoggedInUser,
 } = require("../services/redisConnection");
+
 const { sendMailWithPassword } = require("../services/mailService");
 const { generateAuthToken } = require("../services/authToken");
 
@@ -16,7 +17,12 @@ const createUser = async (req, res, next) => {
         .status(200)
         .json({ data: { data: errorMessages.USER_EXISTS } });
     }
-    const userData = { name, email, password };
+    const userData = {
+      name,
+      email,
+      password,
+      avtar: `images/${req.file.filename.trim()}`,
+    };
     const user = await User.create(userData);
     if (user) {
       return res.status(200).json({ data: user });

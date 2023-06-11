@@ -6,6 +6,7 @@ const app = express();
 
 const pizzaRoutes = require("./src/routes/pizzaRoutes.js");
 const userRoutes = require("./src/routes/userRoutes.js");
+const cartRoutes = require("./src/routes/cartRoutes.js");
 
 const PORT = process.env.PORT || 7000;
 const { dbConnection } = require("./src/db/db.connection");
@@ -23,6 +24,7 @@ require("./src/services/redisConnection");
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static("./public"));
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -35,6 +37,7 @@ app.use((err, req, res, next) => {
 // API Paths
 app.use("/api/pizza", pizzaRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.get("/", (req, res) => {
   return res.send("Hello From ExpressJs Server");
