@@ -1,22 +1,23 @@
 const mongoose = require("mongoose");
 
-const pricesSchema = new mongoose.Schema({
-  small: { type: String, required: true },
-  medium: { type: String, required: true },
-  large: { type: String, required: true },
-});
-
 const cartSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
     },
-    varients: [],
-    prices: [pricesSchema],
-    category: { type: String, required: true },
+    varient: {
+      type: String,
+      enum: ["small", "large", "medium"],
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      required: true,
+    },
+    price: { type: Number },
     image: { type: String, required: true },
-    description: { type: String, required: true },
   },
   { timestamps: true }
 );

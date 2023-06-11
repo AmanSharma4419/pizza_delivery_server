@@ -16,7 +16,7 @@ const createUser = async (req, res, next) => {
         .status(200)
         .json({ data: { data: errorMessages.USER_EXISTS } });
     }
-    const userData = { name: name, email: email, password: password };
+    const userData = { name, email, password };
     const user = await User.create(userData);
     if (user) {
       return res.status(200).json({ data: user });
