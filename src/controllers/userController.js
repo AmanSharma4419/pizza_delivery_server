@@ -21,7 +21,7 @@ const createUser = async (req, res, next) => {
       name,
       email,
       password,
-      avtar: `images/${req.file.filename.trim()}`,
+      avtar: `profile/${req.file.filename}`,
     };
     const user = await User.create(userData);
     if (user) {
@@ -44,7 +44,7 @@ const loginUser = async (req, res, next) => {
           const loggedInUserInfo = JSON.parse(loggedInUserInfoInRedis);
           return res.status(200).json({ data: loggedInUserInfo });
         } else {
-          const loggedInUserInfo = { ...existingUser };
+          const loggedInUserInfo = existingUser;
           const authToken = generateAuthToken(existingUser);
           loggedInUserInfo.authToken = authToken;
           setLoggedInUser(loggedInUserInfo);
@@ -74,4 +74,5 @@ const forgotPassword = async (req, res, next) => {
     next(error);
   }
 };
+
 module.exports = { createUser, loginUser, forgotPassword };

@@ -1,5 +1,6 @@
+const { errorMessages } = require("../constants/errorMessages");
 const Cart = require("../models/cartModel");
-
+const { setItemIoCart } = require("../services/redisConnection");
 const addItemToCart = async (req, res, next) => {
   try {
     const { name, varient, quantity, price, image } = req.body;
@@ -12,6 +13,7 @@ const addItemToCart = async (req, res, next) => {
     };
     const addedItemToCart = await Cart.create(item);
     if (addedItemToCart) {
+      setItemIoCart(addItemToCart);
       return res.status(200).json({ data: addedItemToCart });
     }
   } catch (error) {
@@ -19,4 +21,17 @@ const addItemToCart = async (req, res, next) => {
   }
 };
 
-module.exports = { addItemToCart };
+const getItemsFromCart = async (req, res, next) => {
+  try {
+    const itemListInCart = await Cart.find();
+    if (itemListInCart) {
+      return res.status(200).json({ data: itemListInCart });
+    } else {
+      return res.status(404).json({ error: errorMessages.NOT_FOUND });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { addItemToCart, getItemsFromCart };

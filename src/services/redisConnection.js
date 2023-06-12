@@ -28,4 +28,18 @@ module.exports = {
       console.log(error.message);
     }
   },
+  setItemIoCart: async (item) => {
+    try {
+      const itemInfo = JSON.stringify(item);
+      await client.set(`${item._id}`, itemInfo, (error, reply) => {
+        if (error) {
+          console.log(error.message);
+        } else {
+          console.log("Data set in Redis:", reply);
+        }
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  },
 };
