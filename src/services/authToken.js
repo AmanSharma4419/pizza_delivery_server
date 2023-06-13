@@ -19,12 +19,8 @@ const generateAuthToken = (user) => {
 };
 
 const verifyAuthToken = (token) => {
-  try {
-    const payload = JWT.verify(token, process.env.JWT_SECRET);
-    return payload;
-  } catch (error) {
-    return errorMessages.INVALID_TOKEN;
-  }
+  const payload = JWT.verify(token, process.env.JWT_SECRET);
+  return payload;
 };
 
 module.exports = { generateAuthToken, verifyAuthToken };

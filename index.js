@@ -10,7 +10,6 @@ const cartRoutes = require("./src/routes/cartRoutes.js");
 
 const PORT = process.env.PORT || 7000;
 const { dbConnection } = require("./src/db/db.connection");
-const { checkAuthTokenInHeaders } = require("./src/services/middleware.js");
 
 // Db connection
 dbConnection(process.env.DB_URL).then((res) => {
@@ -25,7 +24,6 @@ require("./src/services/redisConnection");
 // Middlewares
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
-app.use(checkAuthTokenInHeaders("token"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("./public"));
@@ -35,7 +33,7 @@ app.use((err, req, res, next) => {
   // Set a default error status code if not provided
   const statusCode = err.statusCode || 400;
   // Set the response status code and send the error message
-  res.status(statusCode).json({ error: err.message });
+  return res.status(statusCode).json({ error: err.message });
 });
 
 // API Paths

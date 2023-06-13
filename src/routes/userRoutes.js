@@ -23,4 +23,5 @@ const upload = multer({ storage: storage });
 router.post("/add-user", upload.single("avtar"), createUser);
 router.post("/login-user", loginUser);
 router.post("/forgot-password", forgotPassword);
+
 module.exports = router;
