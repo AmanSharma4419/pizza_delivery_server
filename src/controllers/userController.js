@@ -46,9 +46,11 @@ const loginUser = async (req, res, next) => {
         } else {
           const loggedInUserInfo = existingUser;
           const authToken = generateAuthToken(existingUser);
-          loggedInUserInfo.authToken = authToken;
           setLoggedInUser(loggedInUserInfo);
-          return res.status(200).json({ data: loggedInUserInfo });
+          return res
+            .status(200)
+            .cookie("token", authToken)
+            .json({ data: loggedInUserInfo });
         }
       } else {
         return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });

@@ -3,6 +3,7 @@ const errorMessages = {
   USER_NOT_FOUND: "USER_NOT_FOUND",
   INVALID_PASSWORD: "INVALID_PASSWORD",
   NOT_FOUND: "NOT_FOUND",
+  INVALID_TOKEN: "INVALID_TOKEN",
 };
 
 module.exports = { errorMessages };

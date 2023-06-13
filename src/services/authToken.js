@@ -1,4 +1,5 @@
 const JWT = require("jsonwebtoken");
+const { errorMessages } = require("../constants/errorMessages");
 
 const generateAuthToken = (user) => {
   try {
@@ -17,4 +18,13 @@ const generateAuthToken = (user) => {
   }
 };
 
-module.exports = { generateAuthToken };
+const verifyAuthToken = (token) => {
+  try {
+    const payload = JWT.verify(token, process.env.JWT_SECRET);
+    return payload;
+  } catch (error) {
+    return errorMessages.INVALID_TOKEN;
+  }
+};
+
+module.exports = { generateAuthToken, verifyAuthToken };

@@ -3,6 +3,7 @@ const Cart = require("../models/cartModel");
 const { setItemIoCart } = require("../services/redisConnection");
 const addItemToCart = async (req, res, next) => {
   try {
+    console.log(req.user._id, "req.user._id");
     const { name, varient, quantity, price, image } = req.body;
     const item = {
       name,
@@ -10,6 +11,7 @@ const addItemToCart = async (req, res, next) => {
       quantity,
       price,
       image,
+      userId: req.user._id,
     };
     const addedItemToCart = await Cart.create(item);
     if (addedItemToCart) {

@@ -18,6 +18,11 @@ const cartSchema = new mongoose.Schema(
     },
     price: { type: Number },
     image: { type: String, required: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserModel",
+      required: true,
+    },
   },
   { timestamps: true }
 );

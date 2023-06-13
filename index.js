@@ -1,5 +1,5 @@
 const express = require("express");
-
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
@@ -10,6 +10,7 @@ const cartRoutes = require("./src/routes/cartRoutes.js");
 
 const PORT = process.env.PORT || 7000;
 const { dbConnection } = require("./src/db/db.connection");
+const { checkAuthTokenInHeaders } = require("./src/services/middleware.js");
 
 // Db connection
 dbConnection(process.env.DB_URL).then((res) => {
@@ -21,7 +22,10 @@ dbConnection(process.env.DB_URL).then((res) => {
 // Redis connection
 require("./src/services/redisConnection");
 
-app.use(cors());
+// Middlewares
+app.use(cors({ origin: true, credentials: true }));
+app.use(cookieParser());
+app.use(checkAuthTokenInHeaders("token"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("./public"));
@@ -35,8 +39,8 @@ app.use((err, req, res, next) => {
 });
 
 // API Paths
-app.use("/api/pizza", pizzaRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/pizza", pizzaRoutes);
 app.use("/api/cart", cartRoutes);
 
 app.get("/", (req, res) => {
