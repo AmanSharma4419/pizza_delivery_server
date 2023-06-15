@@ -3,7 +3,6 @@ const Cart = require("../models/cartModel");
 const { setItemIoCart } = require("../services/redisConnection");
 const addItemToCart = async (req, res, next) => {
   try {
-    console.log(req.user._id, "req.user._id");
     const { name, varient, quantity, price, image } = req.body;
     const item = {
       name,
@@ -25,7 +24,8 @@ const addItemToCart = async (req, res, next) => {
 
 const getItemsFromCart = async (req, res, next) => {
   try {
-    const itemListInCart = await Cart.find();
+    const { userId } = req.params;
+    const itemListInCart = await Cart.find({ userId: userId });
     if (itemListInCart) {
       return res.status(200).json({ data: itemListInCart });
     } else {

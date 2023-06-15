@@ -33,7 +33,7 @@ app.use((err, req, res, next) => {
   // Set a default error status code if not provided
   const statusCode = err.statusCode || 400;
   // Set the response status code and send the error message
-  return res.status(statusCode).json({ error: err.message });
+  return res.status(statusCode).json({ error: err.message, code: statusCode });
 });
 
 // API Paths

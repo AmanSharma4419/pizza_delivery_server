@@ -9,7 +9,7 @@ const {
 
 router.post("/add-item-cart", checkAuthTokenInHeaders("token"), addItemToCart);
 router.get(
-  "/item-list-cart",
+  "/item-list-cart/:userId",
   checkAuthTokenInHeaders("token"),
   getItemsFromCart
 );
