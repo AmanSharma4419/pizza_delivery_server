@@ -7,10 +7,14 @@ const {
   getItemsFromCart,
 } = require("../controllers/cartController");
 
-router.post("/add-item-cart", checkAuthTokenInHeaders("token"), addItemToCart);
+router.post(
+  "/add-item-cart",
+  checkAuthTokenInHeaders("authToken"),
+  addItemToCart
+);
 router.get(
   "/item-list-cart/:userId",
-  checkAuthTokenInHeaders("token"),
+  checkAuthTokenInHeaders("authToken"),
   getItemsFromCart
 );
 

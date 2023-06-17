@@ -46,10 +46,11 @@ const loginUser = async (req, res, next) => {
         } else {
           const loggedInUserInfo = existingUser;
           const authToken = generateAuthToken(existingUser);
-          setLoggedInUser(loggedInUserInfo);
+          // setLoggedInUser(loggedInUserInfo);
+
           return res
             .status(200)
-            .cookie("token", authToken)
+            .cookie("authToken", authToken)
             .json({ data: loggedInUserInfo });
         }
       } else {
