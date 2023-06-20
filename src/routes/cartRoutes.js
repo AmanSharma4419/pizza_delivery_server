@@ -5,6 +5,8 @@ const { checkAuthTokenInHeaders } = require("../services/middleware");
 const {
   addItemToCart,
   getItemsFromCart,
+  itemQuantityChangeWithPrice,
+  deleteItemFromCart,
 } = require("../controllers/cartController");
 
 router.post(
@@ -12,6 +14,19 @@ router.post(
   checkAuthTokenInHeaders("authToken"),
   addItemToCart
 );
+
+router.delete(
+  "/remove-cart-item/:itemId",
+  checkAuthTokenInHeaders("authToken"),
+  deleteItemFromCart
+);
+
+router.get(
+  "/item-quantity-change",
+  checkAuthTokenInHeaders("authToken"),
+  itemQuantityChangeWithPrice
+);
+
 router.get(
   "/item-list-cart/:userId",
   checkAuthTokenInHeaders("authToken"),

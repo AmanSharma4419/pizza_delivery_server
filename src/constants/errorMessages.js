@@ -4,6 +4,7 @@ const errorMessages = {
   INVALID_PASSWORD: "INVALID_PASSWORD",
   NOT_FOUND: "NOT_FOUND",
   INVALID_TOKEN: "INVALID_TOKEN",
+  INVALID_QUANTITY_TYPE: "INVALID_QUANTITY_TYPE",
 };
 
 module.exports = { errorMessages };

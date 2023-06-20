@@ -36,4 +36,49 @@ const getItemsFromCart = async (req, res, next) => {
   }
 };
 
-module.exports = { addItemToCart, getItemsFromCart };
+const itemQuantityChangeWithPrice = async (req, res, next) => {
+  try {
+    const { itemId, quantity, price } = req.query;
+    if (!["Increase", "Decrease"].includes(quantity)) {
+      return res
+        .status(400)
+        .json({ error: errorMessages.INVALID_QUANTITY_TYPE });
+    }
+    const cartItem = await Cart.findById(itemId);
+    if (cartItem) {
+      if (quantity === "Increase") {
+        cartItem.quantity += 1;
+      } else {
+        cartItem.quantity -= 1;
+      }
+      cartItem.price = price;
+      const updatedItemQnty = await cartItem.save();
+      return res.status(200).json({ data: updatedItemQnty });
+    } else {
+      return res.status(404).json({ error: errorMessages.NOT_FOUND });
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const deleteItemFromCart = async (req, res, next) => {
+  try {
+    const { itemId } = req.params;
+    const removedItem = await Cart.findByIdAndDelete(itemId);
+    if (removedItem) {
+      return res.status(200).json({ data: removedItem });
+    } else {
+      return res.status(404).json({ error: errorMessages.NOT_FOUND });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  addItemToCart,
+  getItemsFromCart,
+  itemQuantityChangeWithPrice,
+  deleteItemFromCart,
+};
