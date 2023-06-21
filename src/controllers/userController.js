@@ -44,10 +44,9 @@ const loginUser = async (req, res, next) => {
           const loggedInUserInfo = JSON.parse(loggedInUserInfoInRedis);
           return res.status(200).json({ data: loggedInUserInfo });
         } else {
-          const loggedInUserInfo = existingUser;
+          const loggedInUserInfo = existingUser._doc;
           const authToken = generateAuthToken(existingUser);
-          // setLoggedInUser(loggedInUserInfo);
-
+          setLoggedInUser({ ...loggedInUserInfo, authToken });
           return res
             .status(200)
             .cookie("authToken", authToken)

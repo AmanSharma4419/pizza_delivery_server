@@ -1,6 +1,7 @@
 const { errorMessages } = require("../constants/errorMessages");
 const Cart = require("../models/cartModel");
-const { setItemIoCart } = require("../services/redisConnection");
+const { setItemIoCart, getCartItems } = require("../services/redisConnection");
+
 const addItemToCart = async (req, res, next) => {
   try {
     const { name, varient, quantity, price, image } = req.body;
@@ -12,10 +13,11 @@ const addItemToCart = async (req, res, next) => {
       image,
       userId: req.user._id,
     };
-    const addedItemToCart = await Cart.create(item);
-    if (addedItemToCart) {
-      setItemIoCart(addItemToCart);
-      return res.status(200).json({ data: addedItemToCart });
+    const itemAddedToCart = await Cart.create(item);
+    if (itemAddedToCart) {
+      const items = await Cart.find({ userId: req.user._id });
+      setItemIoCart(req.user._id + "cartItems", items);
+      return res.status(200).json({ data: itemAddedToCart });
     }
   } catch (error) {
     next(error);
@@ -25,11 +27,17 @@ const addItemToCart = async (req, res, next) => {
 const getItemsFromCart = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const itemListInCart = await Cart.find({ userId: userId });
-    if (itemListInCart) {
-      return res.status(200).json({ data: itemListInCart });
+    const cartItemsInRedis = await getCartItems(userId + "cartItems");
+    if (cartItemsInRedis) {
+      const items = JSON.parse(cartItemsInRedis);
+      return res.status(200).json({ data: items });
     } else {
-      return res.status(404).json({ error: errorMessages.NOT_FOUND });
+      const itemListInCart = await Cart.find({ userId: userId });
+      if (itemListInCart) {
+        return res.status(200).json({ data: itemListInCart });
+      } else {
+        return res.status(404).json({ error: errorMessages.NOT_FOUND });
+      }
     }
   } catch (error) {
     next(error);
@@ -71,6 +79,14 @@ const deleteItemFromCart = async (req, res, next) => {
     const { itemId } = req.params;
     const removedItem = await Cart.findByIdAndDelete(itemId);
     if (removedItem) {
+      const itemListInCart = await getCartItems(req.user._id + "cartItems");
+      if (itemListInCart) {
+        const items = JSON.parse(itemListInCart);
+        const redisCartItems = items.filter(
+          (item) => item._id != removedItem._id
+        );
+        setItemIoCart(req.user._id + "cartItems", redisCartItems);
+      }
       return res.status(200).json({ data: removedItem });
     } else {
       return res.status(404).json({ error: errorMessages.NOT_FOUND });
