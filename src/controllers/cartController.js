@@ -47,7 +47,7 @@ const itemQuantityChangeWithPrice = async (req, res, next) => {
     const cartItem = await Cart.findById(itemId);
     if (cartItem) {
       if (quantity === "Increase") {
-        return (cartItem.quantity += 1);
+        cartItem.quantity += 1;
       } else {
         cartItem.quantity -= 1;
         if (cartItem.quantity <= 0) {
