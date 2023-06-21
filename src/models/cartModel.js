@@ -13,7 +13,8 @@ const cartSchema = new mongoose.Schema(
     },
     quantity: {
       type: Number,
-      enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      min: 1,
+      max: 10,
       required: true,
     },
     price: { type: Number },

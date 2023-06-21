@@ -21,7 +21,7 @@ router.delete(
   deleteItemFromCart
 );
 
-router.get(
+router.post(
   "/item-quantity-change",
   checkAuthTokenInHeaders("authToken"),
   itemQuantityChangeWithPrice

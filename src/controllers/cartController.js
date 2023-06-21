@@ -38,7 +38,7 @@ const getItemsFromCart = async (req, res, next) => {
 
 const itemQuantityChangeWithPrice = async (req, res, next) => {
   try {
-    const { itemId, quantity, price } = req.query;
+    const { itemId, quantity } = req.query;
     if (!["Increase", "Decrease"].includes(quantity)) {
       return res
         .status(400)
@@ -47,13 +47,17 @@ const itemQuantityChangeWithPrice = async (req, res, next) => {
     const cartItem = await Cart.findById(itemId);
     if (cartItem) {
       if (quantity === "Increase") {
-        cartItem.quantity += 1;
+        return (cartItem.quantity += 1);
       } else {
         cartItem.quantity -= 1;
+        if (cartItem.quantity <= 0) {
+          cartItem.quantity = 1;
+        }
       }
-      cartItem.price = price;
-      const updatedItemQnty = await cartItem.save();
-      return res.status(200).json({ data: updatedItemQnty });
+      const item = await cartItem.save();
+      if (item) {
+        return res.status(200).json({ data: item });
+      }
     } else {
       return res.status(404).json({ error: errorMessages.NOT_FOUND });
     }
