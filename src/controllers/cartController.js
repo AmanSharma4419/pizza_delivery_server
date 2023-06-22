@@ -52,22 +52,36 @@ const itemQuantityChangeWithPrice = async (req, res, next) => {
         .status(400)
         .json({ error: errorMessages.INVALID_QUANTITY_TYPE });
     }
-    const cartItem = await Cart.findById(itemId);
-    if (cartItem) {
+    const handleItemQuantityChange = (quantity, item) => {
       if (quantity === "Increase") {
-        cartItem.quantity += 1;
+        item.quantity += 1;
       } else {
-        cartItem.quantity -= 1;
-        if (cartItem.quantity <= 0) {
-          cartItem.quantity = 1;
-        }
+        item.quantity = Math.max(item.quantity - 1, 1);
       }
-      const item = await cartItem.save();
-      if (item) {
+    };
+    const itemListInCart = await getCartItems(req.user._id + "cartItems");
+
+    if (itemListInCart) {
+      const items = JSON.parse(itemListInCart);
+      const itemUpBeUpdate = items.filter((value) => value._id === itemId);
+      if (itemUpBeUpdate) {
+        const item = itemUpBeUpdate[0];
+        handleItemQuantityChange(quantity, item);
+        setItemIoCart(req.user._id + "cartItems", items);
         return res.status(200).json({ data: item });
       }
     } else {
-      return res.status(404).json({ error: errorMessages.NOT_FOUND });
+      const cartItem = await Cart.findById(itemId);
+      if (cartItem) {
+        handleItemQuantityChange(quantity, cartItem);
+        const item = await cartItem.save();
+        console.log(item, "cartItemcartItem");
+        if (item) {
+          return res.status(200).json({ data: item });
+        }
+      } else {
+        return res.status(404).json({ error: errorMessages.NOT_FOUND });
+      }
     }
   } catch (error) {
     return next(error);
