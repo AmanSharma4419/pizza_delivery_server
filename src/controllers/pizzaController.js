@@ -2,8 +2,8 @@ const PizzaModel = require("../models/pizzaModel");
 
 const getAllPizzas = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1; // Current page number, defaulting to 1
-    const pageSize = parseInt(req.query.pageSize) || 6; // Number of items per page, defaulting to 10
+    const page = parseInt(req.query.page) || 1; 
+    const pageSize = parseInt(req.query.pageSize) || 6; 
     const totalDocsCount = await PizzaModel.countDocuments();
     const totalPages = Math.ceil(totalDocsCount / pageSize);
     const pizzas = await PizzaModel.find()
