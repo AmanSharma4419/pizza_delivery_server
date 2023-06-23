@@ -9,7 +9,7 @@ module.exports = {
   setLoggedInUser: async (user) => {
     try {
       const userInfo = JSON.stringify(user);
-      await client.set(`${user._id}`, userInfo, (error, reply) => {
+      await client.set(`${user.email}`, userInfo, (error, reply) => {
         if (error) {
           console.log(error.message);
         } else {
@@ -20,9 +20,9 @@ module.exports = {
       console.log(error.message);
     }
   },
-  getLoggedInUser: async (user) => {
+  getLoggedInUser: async (email) => {
     try {
-      const value = await client.get(`${user._id}`);
+      const value = await client.get(`${email}`);
       return value;
     } catch (error) {
       console.log(error.message);

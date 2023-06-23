@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
 const { errorMessages } = require("../constants/errorMessages");
 const {
   setLoggedInUser,
@@ -35,15 +36,20 @@ const createUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const existingUser = await User.findOne({ email: email }).exec();
-    if (existingUser) {
-      const isPasswordVerified = existingUser.confirmPassword(password);
-      if (isPasswordVerified) {
-        const loggedInUserInfoInRedis = await getLoggedInUser(existingUser);
-        if (loggedInUserInfoInRedis) {
-          const loggedInUserInfo = JSON.parse(loggedInUserInfoInRedis);
-          return res.status(200).json({ data: loggedInUserInfo });
-        } else {
+    const loggedInUserInfoInRedis = await getLoggedInUser(email);
+    if (loggedInUserInfoInRedis) {
+      if (loggedInUserInfoInRedis) {
+        const loggedInUserInfo = JSON.parse(loggedInUserInfoInRedis);
+        return res
+          .status(200)
+          .cookie("authToken", loggedInUserInfo.authToken)
+          .json({ data: loggedInUserInfo });
+      }
+    } else {
+      const existingUser = await User.findOne({ email: email }).exec();
+      if (existingUser) {
+        const isPasswordVerified = existingUser.confirmPassword(password);
+        if (isPasswordVerified) {
           const loggedInUserInfo = existingUser._doc;
           const authToken = generateAuthToken(existingUser);
           setLoggedInUser({ ...loggedInUserInfo, authToken });
@@ -51,12 +57,12 @@ const loginUser = async (req, res, next) => {
             .status(200)
             .cookie("authToken", authToken)
             .json({ data: loggedInUserInfo });
+        } else {
+          return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });
         }
       } else {
-        return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });
+        return res.status(400).json({ data: errorMessages.USER_NOT_FOUND });
       }
-    } else {
-      return res.status(400).json({ data: errorMessages.USER_NOT_FOUND });
     }
   } catch (error) {
     next(error);
