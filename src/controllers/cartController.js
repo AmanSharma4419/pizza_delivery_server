@@ -1,5 +1,6 @@
 const { errorMessages } = require("../constants/errorMessages");
 const Cart = require("../models/cartModel");
+const Order = require("../models/orderModel");
 const { setItemIoCart, getCartItems } = require("../services/redisConnection");
 const { v4: uuidv4 } = require("uuid");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
@@ -114,7 +115,7 @@ const deleteItemFromCart = async (req, res, next) => {
 
 const createOrderPayment = async (req, res, next) => {
   try {
-    const { token, totalAmt } = req.body;
+    const { token, totalAmt, cartItemsIds } = req.body;
     const customer = await stripe.customers.create({
       email: token.email,
       source: token.id,
@@ -129,9 +130,54 @@ const createOrderPayment = async (req, res, next) => {
       { idempotencyKey: uuidv4() }
     );
     if (payment.status === "succeeded") {
-      return res.status(200).json({ data: payment.status });
+      const { email } = token;
+      const { _id } = req.user;
+      const {
+        address_city,
+        address_country,
+        address_line1,
+        address_zip,
+        name,
+        id,
+      } = token.card;
+      const orderDetails = {
+        name: name,
+        email: email,
+        userId: _id,
+        shippingAddress: {
+          address_city: address_city,
+          address_country: address_country,
+          address_line1: address_line1,
+          address_zip: address_zip,
+        },
+        orderItems: cartItemsIds,
+        orderAmmount: totalAmt,
+        transactionId: id,
+      };
+      const order = await Order.create(orderDetails);
+      if (order) {
+        return res.status(200).json({ data: payment.status });
+      } else {
+        return res.status(400).json({ error: errorMessages.ORDER_FAILED });
+      }
     } else {
       return res.status(400).json({ error: errorMessages.PAYMENT_FAILED });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getOrderDetails = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+    const orders = await Order.find({ userId: _id })
+      .populate("userId")
+      .populate("orderItems");
+    if (orders) {
+      return res.status(200).json({ data: orders });
+    } else {
+      return res.status(400).json({ error: errorMessages.NOT_FOUND });
     }
   } catch (error) {
     next(error);
@@ -144,4 +190,5 @@ module.exports = {
   itemQuantityChangeWithPrice,
   deleteItemFromCart,
   createOrderPayment,
+  getOrderDetails,
 };
