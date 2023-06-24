@@ -7,6 +7,7 @@ const {
   getItemsFromCart,
   itemQuantityChangeWithPrice,
   deleteItemFromCart,
+  createOrderPayment,
 } = require("../controllers/cartController");
 
 router.post(
@@ -31,6 +32,12 @@ router.get(
   "/item-list-cart/:userId",
   checkAuthTokenInHeaders("authToken"),
   getItemsFromCart
+);
+
+router.post(
+  "/order-payment",
+  checkAuthTokenInHeaders("authToken"),
+  createOrderPayment
 );
 
 module.exports = router;

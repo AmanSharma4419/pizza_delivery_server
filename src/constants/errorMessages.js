@@ -5,6 +5,7 @@ const errorMessages = {
   NOT_FOUND: "DATA_NOT_FOUND",
   INVALID_TOKEN: "INVALID_TOKEN",
   INVALID_QUANTITY_TYPE: "INVALID_QUANTITY_TYPE",
+  PAYMENT_FAILED: "PAYMENT_FAILED",
 };
 
 module.exports = { errorMessages };

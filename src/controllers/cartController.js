@@ -1,6 +1,8 @@
 const { errorMessages } = require("../constants/errorMessages");
 const Cart = require("../models/cartModel");
 const { setItemIoCart, getCartItems } = require("../services/redisConnection");
+const { v4: uuidv4 } = require("uuid");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const addItemToCart = async (req, res, next) => {
   try {
@@ -110,9 +112,36 @@ const deleteItemFromCart = async (req, res, next) => {
   }
 };
 
+const createOrderPayment = async (req, res, next) => {
+  try {
+    const { token, totalAmt } = req.body;
+    const customer = await stripe.customers.create({
+      email: token.email,
+      source: token.id,
+    });
+    const payment = await stripe.charges.create(
+      {
+        amount: totalAmt * 100,
+        currency: "INR",
+        customer: customer.id,
+        receipt_email: token.email,
+      },
+      { idempotencyKey: uuidv4() }
+    );
+    if (payment.status === "succeeded") {
+      return res.status(200).json({ data: payment.status });
+    } else {
+      return res.status(400).json({ error: errorMessages.PAYMENT_FAILED });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   addItemToCart,
   getItemsFromCart,
   itemQuantityChangeWithPrice,
   deleteItemFromCart,
+  createOrderPayment,
 };
