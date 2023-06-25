@@ -155,6 +155,7 @@ const createOrderPayment = async (req, res, next) => {
         transactionId: id,
       };
       const order = await Order.create(orderDetails);
+
       if (order) {
         return res.status(200).json({ data: payment.status });
       } else {

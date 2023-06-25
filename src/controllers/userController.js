@@ -42,7 +42,10 @@ const loginUser = async (req, res, next) => {
         const loggedInUserInfo = JSON.parse(loggedInUserInfoInRedis);
         return res
           .status(200)
-          .cookie("authToken", loggedInUserInfo.authToken)
+          .cookie("authToken", loggedInUserInfo.authToken, {
+            expires: new Date(Date.now() + 604800000),
+            secure: true,
+          })
           .json({ data: loggedInUserInfo });
       }
     } else {
@@ -55,7 +58,10 @@ const loginUser = async (req, res, next) => {
           setLoggedInUser({ ...loggedInUserInfo, authToken });
           return res
             .status(200)
-            .cookie("authToken", authToken)
+            .cookie("authToken", authToken, {
+              expires: new Date(Date.now() + 604800000),
+              secure: true,
+            })
             .json({ data: loggedInUserInfo });
         } else {
           return res.status(400).json({ data: errorMessages.INVALID_PASSWORD });
