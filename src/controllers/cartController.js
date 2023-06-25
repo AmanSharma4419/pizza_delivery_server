@@ -173,7 +173,8 @@ const getOrderDetails = async (req, res, next) => {
     const { _id } = req.user;
     const orders = await Order.find({ userId: _id })
       .populate("userId")
-      .populate("orderItems");
+      .populate("orderItems")
+      .exec();
     if (orders) {
       return res.status(200).json({ data: orders });
     } else {
