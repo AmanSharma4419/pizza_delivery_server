@@ -9,7 +9,7 @@ const userRoutes = require("./src/routes/userRoutes.js");
 const cartRoutes = require("./src/routes/cartRoutes.js");
 
 const PORT = process.env.PORT || 7000;
-const { dbConnection } = require("./src/db/db.connection");
+const { dbConnection } = require("./src/db/db.connection.js");
 
 // Db connection
 dbConnection(process.env.DB_URL).then((res) => {
@@ -19,7 +19,7 @@ dbConnection(process.env.DB_URL).then((res) => {
 });
 
 // Redis connection
-require("./src/services/redisConnection");
+require("./src/services/redisConnection.js");
 
 // Middlewares
 app.use(cors({ origin: true, credentials: true }));
